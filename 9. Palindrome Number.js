@@ -12,7 +12,7 @@ Determine whether an integer is a palindrome. Do this without extra space.
  */
 var isPalindrome = function(x) {
     x=x.toString();
-    for (let i=0;i<x.length;i++) {
+    for (let i=0;i<x.length/2;i++) {
         if (x.charAt(i)!==x.charAt(x.length-i-1)) {
             return false;
         }
