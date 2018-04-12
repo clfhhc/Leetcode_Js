@@ -45,6 +45,7 @@ var findAnagrams=function(s,p) {
         return indexAnagrams;
     }
 
+    //Hash Table
     var map= new Array(256).fill(0);
     
     for (let i=0;i<p.length;i++) {
