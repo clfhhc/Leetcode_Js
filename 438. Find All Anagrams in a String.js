@@ -57,23 +57,23 @@ var findAnagrams=function(s,p) {
     var unqualifiedCount=p.length;
 
     while (index2<p.length) {
-        map[s.charCodeAt(index2)]>0 ? unqualifiedCount-- : null;
+        map[s.charCodeAt(index2)]>0 && unqualifiedCount--;
         map[s.charCodeAt(index2)]--;
         index2++;
     }
 
-    unqualifiedCount===0 ? indexAnagrams.push(index) : null;
+    unqualifiedCount===0 && indexAnagrams.push(index);
 
     while (index2<s.length) {
-        map[s.charCodeAt(index)]>=0 ? unqualifiedCount++ : null;
+        map[s.charCodeAt(index)]>=0 && unqualifiedCount++;
         map[s.charCodeAt(index)]++;
         index++;
 
-        map[s.charCodeAt(index2)]>0 ? unqualifiedCount-- : null;
+        map[s.charCodeAt(index2)]>0 && unqualifiedCount--;
         map[s.charCodeAt(index2)]--;
         index2++;
 
-        unqualifiedCount===0 ? indexAnagrams.push(index) : null;
+        unqualifiedCount===0 && indexAnagrams.push(index);
     }
 
     return indexAnagrams;
@@ -84,4 +84,4 @@ var findAnagrams=function(s,p) {
 const chai = require('./Chai.js/chai');
 
 chai.expect(findAnagrams("cbaebabacd","abc")).to.eql([0,6]);
-chai.expect(findAnagrams("abab","abc")).to.eql([0,1,2]);
+chai.expect(findAnagrams("abab","ab")).to.eql([0,1,2]);
