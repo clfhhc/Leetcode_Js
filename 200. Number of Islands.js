@@ -28,38 +28,58 @@ Output: 3
  * @return {number}
  */
 const numIslands = function(grid) {
+  const breakup = 20;
   if (!grid.length) { return 0; }
   const gridBin = [];
   grid.forEach(row => {
-    gridBin.push(parseInt(row.join(''), 2));
+    const temp = [];
+    let part = 0;
+    while (row.length > part * breakup) {
+      temp.push(parseInt(row.slice(Math.max(row.length - (part + 1) * breakup, 0), row.length - part * breakup).join(''), 2));
+      part++;
+    }
+    gridBin.push(temp.slice());
   })
   let islandCounter = 0;
   let counter = 0
-  const recurse = (i, j) => {
-    console.log(i, j.toString(2));
-    gridBin[i] ^= j;
-    let nextI, nextJ;
+  const recurse = (i, part, j) => {
+    gridBin[i][part] ^= j;
+    let nextI, nextPart, nextJ;
 
     for (let k = 0; k < 4; k++) {
       switch (k) {
         case 0:
           nextI = i - 1;
+          nextPart = part;
           nextJ = j;
           break;
         case 1:
           nextI = i;
-          nextJ = j >> 1;
+          if (j >> 1) {
+            nextPart = part;
+            nextJ = j >> 1;
+          } else {
+            nextPart = part - 1;
+            nextJ = (gridBin[nextI] && gridBin[nextI][nextPart] && (1 << (breakup - 1))) || 0;
+          }
           break;
         case 2:
           nextI = i + 1;
+          nextPart = part;
           nextJ = j;
           break;
         case 3:
           nextI = i;
-          nextJ = j << 1;
+          if ((j << 1) <= (1 << breakup - 1)) {
+            nextPart = part;
+            nextJ = j << 1;
+          } else {
+            nextPart = part + 1;
+            nextJ = 1;
+          }
       }
-      if (nextI >= 0 && nextI < grid.length && (gridBin[nextI] & nextJ)) {
-        recurse(nextI, nextJ);
+      if (nextI >= 0 && nextPart >= 0 && nextI < gridBin.length && nextPart < gridBin[nextI].length && (gridBin[nextI][nextPart] & nextJ)) {
+        recurse(nextI, nextPart, nextJ);
       }
     }
 
@@ -67,9 +87,13 @@ const numIslands = function(grid) {
 
   let row = 0;
   while (row < gridBin.length) {
-    while (gridBin[row]) {
-      islandCounter++;
-      recurse(row, -gridBin[row] & gridBin[row]);
+    let part = 0;
+    while (part < gridBin[row].length) {
+      while (gridBin[row][part]) {
+        islandCounter++;
+        recurse(row, part, -gridBin[row][part] & gridBin[row][part]);
+      }
+      part++;
     }
     row++;
   }
@@ -87,7 +111,7 @@ let inputs = [
   [["1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","0","0","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","0","0","0","0","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1"]]
 ];
 let expecteds = [1, 3, 3];
-// inputs.forEach((input, index) => {
-//   chai.expect(numIslands(input)).to.equal(expecteds[index]);
-// })
-numIslands(inputs[2]);
+inputs.forEach((input, index) => {
+  chai.expect(numIslands(input)).to.equal(expecteds[index]);
+})
+// console.log(numIslands(inputs[2]));
