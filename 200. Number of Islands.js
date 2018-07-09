@@ -28,74 +28,101 @@ Output: 3
  * @return {number}
  */
 const numIslands = function(grid) {
-  const breakup = 20;
-  if (!grid.length) { return 0; }
-  const gridBin = [];
-  grid.forEach(row => {
-    const temp = [];
-    let part = 0;
-    while (row.length > part * breakup) {
-      temp.push(parseInt(row.slice(Math.max(row.length - (part + 1) * breakup, 0), row.length - part * breakup).join(''), 2));
-      part++;
-    }
-    gridBin.push(temp.slice());
-  })
-  let islandCounter = 0;
-  let counter = 0
-  const recurse = (i, part, j) => {
-    gridBin[i][part] ^= j;
-    let nextI, nextPart, nextJ;
+  // bitwise solution:
 
-    for (let k = 0; k < 4; k++) {
-      switch (k) {
-        case 0:
-          nextI = i - 1;
-          nextPart = part;
-          nextJ = j;
-          break;
-        case 1:
-          nextI = i;
-          if (j >> 1) {
-            nextPart = part;
-            nextJ = j >> 1;
-          } else {
-            nextPart = part - 1;
-            nextJ = (gridBin[nextI] && gridBin[nextI][nextPart] && (1 << (breakup - 1))) || 0;
-          }
-          break;
-        case 2:
-          nextI = i + 1;
-          nextPart = part;
-          nextJ = j;
-          break;
-        case 3:
-          nextI = i;
-          if ((j << 1) <= (1 << breakup - 1)) {
-            nextPart = part;
-            nextJ = j << 1;
-          } else {
-            nextPart = part + 1;
-            nextJ = 1;
-          }
-      }
-      if (nextI >= 0 && nextPart >= 0 && nextI < gridBin.length && nextPart < gridBin[nextI].length && (gridBin[nextI][nextPart] & nextJ)) {
-        recurse(nextI, nextPart, nextJ);
-      }
-    }
+  // const breakup = 20;
+  // if (!grid.length) { return 0; }
+  // const gridBin = [];
+  // grid.forEach(row => {
+  //   const temp = [];
+  //   let part = 0;
+  //   while (row.length > part * breakup) {
+  //     temp.push(parseInt(row.slice(Math.max(row.length - (part + 1) * breakup, 0), row.length - part * breakup).join(''), 2));
+  //     part++;
+  //   }
+  //   gridBin.push(temp.slice());
+  // })
+  // let islandCounter = 0;
+  // let counter = 0
+  // const recurse = (i, part, j) => {
+  //   gridBin[i][part] ^= j;
+  //   let nextI, nextPart, nextJ;
 
+  //   for (let k = 0; k < 4; k++) {
+  //     switch (k) {
+  //       case 0:
+  //         nextI = i - 1;
+  //         nextPart = part;
+  //         nextJ = j;
+  //         break;
+  //       case 1:
+  //         nextI = i;
+  //         if (j >> 1) {
+  //           nextPart = part;
+  //           nextJ = j >> 1;
+  //         } else {
+  //           nextPart = part - 1;
+  //           nextJ = (gridBin[nextI] && gridBin[nextI][nextPart] && (1 << (breakup - 1))) || 0;
+  //         }
+  //         break;
+  //       case 2:
+  //         nextI = i + 1;
+  //         nextPart = part;
+  //         nextJ = j;
+  //         break;
+  //       case 3:
+  //         nextI = i;
+  //         if ((j << 1) <= (1 << breakup - 1)) {
+  //           nextPart = part;
+  //           nextJ = j << 1;
+  //         } else {
+  //           nextPart = part + 1;
+  //           nextJ = 1;
+  //         }
+  //     }
+  //     if (nextI >= 0 && nextPart >= 0 && nextI < gridBin.length && nextPart < gridBin[nextI].length && (gridBin[nextI][nextPart] & nextJ)) {
+  //       recurse(nextI, nextPart, nextJ);
+  //     }
+  //   }
+
+  // }
+
+  // let row = 0;
+  // while (row < gridBin.length) {
+  //   let part = 0;
+  //   while (part < gridBin[row].length) {
+  //     while (gridBin[row][part]) {
+  //       islandCounter++;
+  //       recurse(row, part, -gridBin[row][part] & gridBin[row][part]);
+  //     }
+  //     part++;
+  //   }
+  //   row++;
+  // }
+  // return islandCounter;
+
+  if (grid.length === 0) {
+      return 0;
   }
-
-  let row = 0;
-  while (row < gridBin.length) {
-    let part = 0;
-    while (part < gridBin[row].length) {
-      while (gridBin[row][part]) {
-        islandCounter++;
-        recurse(row, part, -gridBin[row][part] & gridBin[row][part]);
+  const width = grid[0].length;
+  const height = grid.length;
+  let islandCounter = 0;
+  const explore = (i, j) => {
+      if (i >= 0 && i < height && j >= 0 && j < width && grid[i][j] == "1") {
+          grid[i][j] = "0";
+          explore(i + 1, j);
+          explore(i - 1, j);
+          explore(i, j + 1);
+          explore(i, j - 1);
       }
-      part++;
-    }
-    row++;
+  };
+  for (let i = 0; i < height; i++) {
+      for (let j = 0; j < width; j++) {
+          if (grid[i][j] == "1") {
+              explore(i, j);
+              islandCounter++;
+          }
+      }
   }
   return islandCounter;
 };
