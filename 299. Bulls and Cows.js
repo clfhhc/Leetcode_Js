@@ -33,20 +33,22 @@ Note: You may assume that the secret number and your friend's guess only contain
  */
 
 const getHint = function(secret, guess) {
-    const numObj = secret.split('').reduce((accu, num) => {
-        accu[num] = accu[num] || 0;
-        accu[num] += 1;
-        return accu;
-    }, {});
-    let bullNum = 0;
-    guess.split('').forEach((digit, i) => {
-        if (digit === secret[i]) {
-            bullNum += 1;
+    let bull = 0;
+    let cow = 0;
+    const secretObj = Array(10).fill(0);
+    const guessObj = Array(10).fill(0);
+    secret.split('').forEach((num, i) => {
+        if (num === guess[i]) {
+            bull += 1;
+        } else {
+            secretObj[num] += 1;
+            guessObj[guess[i]] += 1;
         }
-        (numObj[digit] !== undefined) && (numObj[digit] -= 1);
-        
-    });
-    return `${bullNum}A${Object.keys(numObj).reduce((accu, num) => accu - Math.max(numObj[num], 0), guess.length) - bullNum}B`;
+    })
+    secretObj.forEach((num, i) => {
+        cow += Math.min(num, guessObj[i]);
+    })
+    return `${bull}A${cow}B`;
 };
 
 
